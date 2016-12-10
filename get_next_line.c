@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/10 15:01:00 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/10 15:07:55 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,10 @@ int		extract_line(t_file *file, char **line, char *buff, size_t size)
 	if ((nl = ft_memchr(buff, '\n', size)))
 	{
 		*line = ft_memjoin(NULL, buff, 0, buff - nl);
-		file->rest = ft_memjoin(nl, NULL, file->size - (file->rest - nl), 0);
+		*nl = '\0';
+		file->size = size - (file->rest - nl);
+		free(file->rest);
+		file->rest = ft_memjoin(nl, NULL, file->size, 0);
 		if (file->rest == NULL)
 			return (-1);
 		return (1);
@@ -78,6 +81,6 @@ int		get_next_line(const int fd, char **line)
 	if (files == NULL && (files = malloc(sizeof *files)) != NULL)
 		return (-1);
 	file = find_or_create_struct(files, fd);
-	manage_file(file, line);
-	return (0);
+	if (manage_file(file, line) == 1)
+		return (1);
 }
