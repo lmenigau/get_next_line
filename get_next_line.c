@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/10 14:50:17 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/10 15:01:00 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,13 @@ int		extract_line(t_file *file, char **line, char *buff, size_t size)
 	char	*nl;
 	if ((nl = ft_memchr(buff, '\n', size)))
 	{
-			*line = ft_memjoin(NULL, buff, 0, buff - nl);
-			file->rest = ft_memjoin(nl, file->size - (file->rest - nl));
-			return (1);
+		*line = ft_memjoin(NULL, buff, 0, buff - nl);
+		file->rest = ft_memjoin(nl, NULL, file->size - (file->rest - nl), 0);
+		if (file->rest == NULL)
+			return (-1);
+		return (1);
 	}
+	return (0);
 }
 
 int		manage_file(t_file *file, char **line)
