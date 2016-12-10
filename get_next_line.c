@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/10 15:07:55 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/10 16:10:29 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,11 @@
 t_file	*find_or_create_struct(t_list *files, int fd)
 {
 	t_file	*file;
-	t_file	newfile;
 	t_list	*prevfile;
+	t_file	*newfile;
 
-	while (files != NULL)
+	prevfile = files->content;
+	while (files != NULL && prevfile)
 	{
 		file = files->content;
 		if (file->fd == fd)
@@ -26,11 +27,16 @@ t_file	*find_or_create_struct(t_list *files, int fd)
 		files = files->next;
 		prevfile = files;
 	}
-	newfile.fd = fd;
-	newfile.rest = NULL;
-	newfile.size = 0;
-	prevfile->next = ft_lstnew(&newfile, sizeof (newfile));
-	return (prevfile->next->content);
+	if ((newfile = malloc(sizeof (t_file))) == NULL)
+		return (NULL);
+	newfile->fd = fd;
+	newfile->rest = NULL;
+	newfile->size = 0;
+	if (prevfile)
+		prevfile->next->content = newfile;
+	else
+		prevfile->content = newfile;
+	return (newfile);
 }
 
 int		extract_line(t_file *file, char **line, char *buff, size_t size)
@@ -71,6 +77,7 @@ int		manage_file(t_file *file, char **line)
 			ft_memjoin(file->rest, buff, file->size, byte_read);
 	}
 	free(buff);
+	return (0);
 }
 
 int		get_next_line(const int fd, char **line)
@@ -83,4 +90,5 @@ int		get_next_line(const int fd, char **line)
 	file = find_or_create_struct(files, fd);
 	if (manage_file(file, line) == 1)
 		return (1);
+	return (0);
 }
