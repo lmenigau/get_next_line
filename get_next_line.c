@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/10 12:46:28 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/10 14:50:17 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ t_file	*find_or_create_struct(t_list *files, int fd)
 int		extract_line(t_file *file, char **line, char *buff, size_t size)
 {
 	char	*nl;
-	if ((nl = ft_memchr(buff, '\n', byte_read)))
+	if ((nl = ft_memchr(buff, '\n', size)))
 	{
 			*line = ft_memjoin(NULL, buff, 0, buff - nl);
 			file->rest = ft_memjoin(nl, file->size - (file->rest - nl));
@@ -54,15 +54,13 @@ int		manage_file(t_file *file, char **line)
 	nl = NULL;
 	if (file->size != 0)
 	{
-		if ((nl = ft_memchr(file->rest, '\n', file->size)))
-		{
-			*line = ft_memjoin(NULL, file->rest, 0, file->rest - nl);
-			file->rest = ft_memjoin(file->rest, nl, file->size, file->size - (file->rest - nl));
-			return (1);
-		}
+		if (extract_line(file, line, buff, file->size) == -1)
+			return (-1);
 	}
 	while ((byte_read = read(file->fd, buff, BUFF_SIZE)) > 0)
 	{
+		if (extract_line(file, line, buff, byte_read) == -1)
+				return (-1);
 		else
 			ft_memjoin(file->rest, buff, file->size, byte_read);
 	}
