@@ -6,36 +6,33 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/13 15:53:09 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/13 21:57:45 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-t_file	*find_or_create_struct(t_list *files, int fd)
+t_file	*find_or_create_struct(t_list **files, int fd)
 {
 	t_file	*file;
 	t_list	*prevfile;
+	t_list	*current;
 	t_file	*newfile;
 
-	prevfile = NULL;
-	while (files != NULL && files->content)
+	current = *files;
+	while (current != NULL)
 	{
-		file = files->content;
+		file = current->content;
 		if (file->fd == fd)
 			return (file);
-		prevfile = files;
-		files = files->next;
+		current = current->next;
 	}
-	if ((newfile = malloc(sizeof (t_file))) == NULL)
-		return (NULL);
+	newfile = ft_memalloc(sizeof(t_file));
 	newfile->fd = fd;
-	newfile->rest = NULL;
-	newfile->size = 0;
-	if (prevfile)
-		prevfile->next->content = newfile;
-	else
-		files->content = newfile;
+	prevfile = *files;
+	*files = malloc(sizeof(**files));
+	(*files)->content = newfile;
+	(*files)->next = prevfile;
 	return (newfile);
 }
 
@@ -66,7 +63,7 @@ int		manage_file(t_file *file, char **line)
 	char	*buff;
 	int		ret;
 
-	if (!file->size && (ret = extract_line(file, line, file->rest, file->size)))
+	if (file->size && (ret = extract_line(file, line, file->rest, file->size)))
 		return (ret);
 	if ((buff = malloc(BUFF_SIZE)) == NULL)
 		return (-1);
@@ -90,9 +87,25 @@ int		get_next_line(const int fd, char **line)
 {
 	t_file			*file;
 	static t_list	*files = NULL;
+	int				ret;
 
-	if (files == NULL && (files = ft_memalloc(sizeof *files)) == NULL)
+	if (line == NULL || fd < 0)
 		return (-1);
-	file = find_or_create_struct(files, fd);
-	return (manage_file(file, line));
+	if (files == NULL)
+	{
+		files = malloc(sizeof(t_list));
+		file = ft_memalloc(sizeof(t_file));
+		file->fd = fd;
+		files->content = file;
+	}
+	file = find_or_create_struct(&files, fd);
+	ret = manage_file(file, line);
+	if (file->size && !ret)
+	{
+		*line = ft_memjoin(NULL, file->rest, 0, file->size + 1);
+		(*line)[file->size] = '\0';
+		file->size = 0;
+		return (1);
+	}
+	return (ret);
 }
