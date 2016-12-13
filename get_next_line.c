@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/13 15:02:24 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/13 15:45:49 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ int		extract_line(t_file *file, char **line, char *buff, size_t size)
 int		manage_file(t_file *file, char **line)
 {
 	int		byte_read;
+	char	*to_free;
 	char	*buff;
 	int		ret;
 
@@ -72,19 +73,22 @@ int		manage_file(t_file *file, char **line)
 		else if (ret == -1)
 			return (-1);
 	}
-	buff = malloc(BUFF_SIZE);
+	if ((buff = malloc(BUFF_SIZE)) == NULL)
+		return (-1);
 	while ((byte_read = read(file->fd, buff, BUFF_SIZE)) > 0)
 	{
-		ret = extract_line(file, line, buff, byte_read);
-		if (ret == 0)
-		{
-			file->rest = ft_memjoin(file->rest, buff, file->size, byte_read);
-			file->size += byte_read;
-		}
-		free(buff);
+		to_free = file->rest;
+		file->rest = ft_memjoin(file->rest, buff, file->size, byte_read);
+		free(to_free);
+		file->size += byte_read;
+		ret = extract_line(file, line, file->rest, file->size);
 		if (ret)
+		{
+			free(buff);
 			return (ret);
+		}
 	}
+	free(buff);
 	return (byte_read);
 }
 
