@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 14:05:57 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/13 21:57:45 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/14 18:36:26 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,10 @@ int		get_next_line(const int fd, char **line)
 		return (-1);
 	if (files == NULL)
 	{
-		files = malloc(sizeof(t_list));
-		file = ft_memalloc(sizeof(t_file));
+		if ((files = malloc(sizeof(t_list))) == NULL)
+			return (-1);
+		if ((file = ft_memalloc(sizeof(t_file))) == NULL)
+			return (-1);
 		file->fd = fd;
 		files->content = file;
 	}

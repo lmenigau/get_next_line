@@ -6,7 +6,7 @@
 /*   By: lmenigau <lmenigau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/06 13:19:39 by lmenigau          #+#    #+#             */
-/*   Updated: 2016/12/13 20:22:10 by lmenigau         ###   ########.fr       */
+/*   Updated: 2016/12/13 22:37:46 by lmenigau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # include "libft/libft.h"
-# define BUFF_SIZE	16
+# define BUFF_SIZE	41
 
 typedef struct		s_file
 {
